@@ -13,33 +13,12 @@ TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "").strip()
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "").strip()
 TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER", "").strip()
 DESTINATION_PHONE_NUMBER = os.getenv("DESTINATION_PHONE_NUMBER", "").strip()
-
-# Alternatively, if the format needs to be fixed on the fly:
-def load_env_manually():
-    """Manually parse .env file if the standard method fails"""
-    try:
-        with open('.env', 'r') as file:
-            for line in file:
-                line = line.strip()
-                if line and not line.startswith('#'):
-                    key, value = [x.strip() for x in line.split('=', 1)]
-                    os.environ[key] = value
-                    
-        # Reload values after manual parsing
-        global ULTRAVOX_API_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER, DESTINATION_PHONE_NUMBER
-        ULTRAVOX_API_KEY = os.getenv("ULTRAVOX_API_KEY", "").strip()
-        TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "").strip()
-        TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "").strip()
-        TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER", "").strip()
-        DESTINATION_PHONE_NUMBER = os.getenv("DESTINATION_PHONE_NUMBER", "").strip()
-    except Exception as e:
-        print(f"Error loading .env file manually: {e}")
+CORPUS_ID = os.getenv("CORPUS_ID", "").strip()
 
 # If any required variable is empty, try manual loading
 if not all([ULTRAVOX_API_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, 
            TWILIO_PHONE_NUMBER, DESTINATION_PHONE_NUMBER]):
-    print("Standard env loading failed, trying manual method...")
-    load_env_manually()
+    print("Standard env loading failed.")
 
 # Ultravox call configuration
 with open('prompt.txt', 'r') as file:
@@ -51,7 +30,17 @@ ULTRAVOX_CALL_CONFIG = {
     "voice": "Chinmay-English-Indian",
     "temperature": 0.3,
     "firstSpeaker": "FIRST_SPEAKER_USER",
-    "medium": {"twilio": {}}
+    "medium": {"twilio": {}},
+    "selectedTools":[
+        { "toolName": "hangUp" },
+        {
+        "toolName": "queryCorpus", 
+        "parameterOverrides": {
+            "corpus_id": CORPUS_ID,
+            "max_results": 3
+        }
+        }
+    ]
 }
 
 ULTRAVOX_API_URL = "https://api.ultravox.ai/api/calls"

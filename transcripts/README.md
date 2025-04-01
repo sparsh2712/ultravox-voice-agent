@@ -1,0 +1,1 @@
+# Transcript directory do not push it to the github repo
